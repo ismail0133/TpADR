@@ -1,0 +1,143 @@
+@startuml
+title ProxiVroum - Diagramme de classes du domaine
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty methods
+
+class Utilisateur {
+  - id : Long
+  - nom : String
+  - prenom : String
+  - email : String
+  - telephone : String
+  - role : Role
+}
+
+class Conducteur {
+}
+
+class Passager {
+}
+
+class Moderateur {
+}
+
+class ServiceComptabilite {
+}
+
+class Trajet {
+  - id : Long
+  - villeDepart : String
+  - villeArrivee : String
+  - dateDepart : Date
+  - heureDepart : String
+  - prixPlace : Double
+  - nbPlacesTotal : Integer
+  - nbPlacesDisponibles : Integer
+  - statut : StatutTrajet
+}
+
+class Reservation {
+  - id : Long
+  - dateReservation : Date
+  - nombrePlaces : Integer
+  - statut : StatutReservation
+}
+
+class Paiement {
+  - id : Long
+  - montant : Double
+  - datePaiement : Date
+  - statut : StatutPaiement
+  - referenceTransaction : String
+}
+
+class Avis {
+  - id : Long
+  - note : Integer
+  - commentaire : String
+  - dateAvis : Date
+}
+
+class Litige {
+  - id : Long
+  - motif : String
+  - description : String
+  - statut : StatutLitige
+  - dateSignalement : Date
+}
+
+class Statistique {
+  - id : Long
+  - dateGeneration : Date
+  - nbTrajets : Integer
+  - nbReservations : Integer
+  - chiffreAffaires : Double
+}
+
+class ExportComptable {
+  - id : Long
+  - dateExport : Date
+  - periode : String
+  - format : String
+}
+
+enum Role {
+  CONDUCTEUR
+  PASSAGER
+  MODERATEUR
+  COMPTABILITE
+}
+
+enum StatutTrajet {
+  DISPONIBLE
+  COMPLET
+  ANNULE
+  TERMINE
+}
+
+enum StatutReservation {
+  EN_ATTENTE
+  CONFIRMEE
+  ANNULEE
+}
+
+enum StatutPaiement {
+  EN_ATTENTE
+  VALIDE
+  REFUSE
+  REMBOURSE
+}
+
+enum StatutLitige {
+  OUVERT
+  EN_COURS
+  RESOLU
+  REJETE
+}
+
+Utilisateur <|-- Conducteur
+Utilisateur <|-- Passager
+Utilisateur <|-- Moderateur
+Utilisateur <|-- ServiceComptabilite
+
+Conducteur "1" -- "0..*" Trajet : publie
+Passager "1" -- "0..*" Reservation : effectue
+Trajet "1" -- "0..*" Reservation : contient
+Reservation "1" -- "1" Paiement : possède
+
+Utilisateur "1" -- "0..*" Avis : rédige
+Trajet "1" -- "0..*" Avis : reçoit
+
+Utilisateur "1" -- "0..*" Litige : signale
+Reservation "1" -- "0..*" Litige : concerne
+Moderateur "1" -- "0..*" Litige : traite
+
+ServiceComptabilite "1" -- "0..*" ExportComptable : génère
+ExportComptable "1" -- "0..*" Paiement : regroupe
+
+Moderateur "1" -- "0..*" Statistique : consulte
+ServiceComptabilite "1" -- "0..*" Statistique : consulte
+
+@enduml

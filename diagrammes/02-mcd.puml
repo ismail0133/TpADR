@@ -1,0 +1,102 @@
+@startuml
+title ProxiVroum - MCD
+
+hide circle
+skinparam linetype ortho
+skinparam entity {
+  BackgroundColor #F9F9F9
+  BorderColor #333333
+}
+
+entity "UTILISATEUR" as Utilisateur {
+  * id_utilisateur : INT
+  --
+  nom : VARCHAR(100)
+  prenom : VARCHAR(100)
+  email : VARCHAR(150)
+  telephone : VARCHAR(20)
+  role : VARCHAR(50)
+}
+
+entity "TRAJET" as Trajet {
+  * id_trajet : INT
+  --
+  ville_depart : VARCHAR(100)
+  ville_arrivee : VARCHAR(100)
+  date_depart : DATE
+  heure_depart : TIME
+  prix_place : DECIMAL(10,2)
+  nb_places_total : INT
+  nb_places_disponibles : INT
+  statut : VARCHAR(50)
+}
+
+entity "RESERVATION" as Reservation {
+  * id_reservation : INT
+  --
+  date_reservation : DATE
+  nombre_places : INT
+  statut : VARCHAR(50)
+}
+
+entity "PAIEMENT" as Paiement {
+  * id_paiement : INT
+  --
+  montant : DECIMAL(10,2)
+  date_paiement : DATE
+  statut : VARCHAR(50)
+  reference_transaction : VARCHAR(150)
+}
+
+entity "AVIS" as Avis {
+  * id_avis : INT
+  --
+  note : INT
+  commentaire : TEXT
+  date_avis : DATE
+}
+
+entity "LITIGE" as Litige {
+  * id_litige : INT
+  --
+  motif : VARCHAR(150)
+  description : TEXT
+  statut : VARCHAR(50)
+  date_signalement : DATE
+}
+
+entity "STATISTIQUE" as Statistique {
+  * id_statistique : INT
+  --
+  date_generation : DATE
+  nb_trajets : INT
+  nb_reservations : INT
+  chiffre_affaires : DECIMAL(10,2)
+}
+
+entity "EXPORT_COMPTABLE" as ExportComptable {
+  * id_export : INT
+  --
+  date_export : DATE
+  periode : VARCHAR(50)
+  format : VARCHAR(20)
+}
+
+Utilisateur ||--o{ Trajet : publie
+Utilisateur ||--o{ Reservation : effectue
+Trajet ||--o{ Reservation : concerne
+
+Reservation ||--|| Paiement : génère
+
+Utilisateur ||--o{ Avis : rédige
+Trajet ||--o{ Avis : reçoit
+
+Utilisateur ||--o{ Litige : signale
+Reservation ||--o{ Litige : concerne
+
+Statistique ||--o{ Trajet : analyse
+Statistique ||--o{ Reservation : analyse
+
+ExportComptable ||--o{ Paiement : regroupe
+
+@enduml

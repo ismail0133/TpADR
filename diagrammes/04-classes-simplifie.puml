@@ -1,0 +1,114 @@
+@startuml
+title ProxiVroum - Diagramme de classes simplifié
+
+skinparam classAttributeIconSize 0
+skinparam linetype ortho
+hide empty methods
+
+class Utilisateur {
+  - id : Long
+  - nom : String
+  - email : String
+  - telephone : String
+  - role : Role
+}
+
+class Trajet {
+  - id : Long
+  - villeDepart : String
+  - villeArrivee : String
+  - dateDepart : Date
+  - prixPlace : Double
+  - nbPlacesDisponibles : Integer
+  - statut : StatutTrajet
+}
+
+class Reservation {
+  - id : Long
+  - dateReservation : Date
+  - nombrePlaces : Integer
+  - statut : StatutReservation
+}
+
+class Paiement {
+  - id : Long
+  - montant : Double
+  - statut : StatutPaiement
+  - referenceTransaction : String
+}
+
+class Avis {
+  - id : Long
+  - note : Integer
+  - commentaire : String
+}
+
+class Litige {
+  - id : Long
+  - motif : String
+  - description : String
+  - statut : StatutLitige
+}
+
+class ExportComptable {
+  - id : Long
+  - dateExport : Date
+  - periode : String
+}
+
+class Statistique {
+  - id : Long
+  - nbTrajets : Integer
+  - nbReservations : Integer
+  - chiffreAffaires : Double
+}
+
+enum Role {
+  CONDUCTEUR
+  PASSAGER
+  MODERATEUR
+  COMPTABILITE
+}
+
+enum StatutTrajet {
+  DISPONIBLE
+  COMPLET
+  ANNULE
+  TERMINE
+}
+
+enum StatutReservation {
+  EN_ATTENTE
+  CONFIRMEE
+  ANNULEE
+}
+
+enum StatutPaiement {
+  VALIDE
+  REFUSE
+  REMBOURSE
+}
+
+enum StatutLitige {
+  OUVERT
+  EN_COURS
+  RESOLU
+  REJETE
+}
+
+Utilisateur "1" -- "0..*" Trajet : publie
+Utilisateur "1" -- "0..*" Reservation : réserve
+Trajet "1" -- "0..*" Reservation : contient
+Reservation "1" -- "1" Paiement : paiement
+
+Utilisateur "1" -- "0..*" Avis : rédige
+Trajet "1" -- "0..*" Avis : reçoit
+
+Utilisateur "1" -- "0..*" Litige : signale
+Reservation "1" -- "0..*" Litige : concerne
+
+ExportComptable "1" -- "0..*" Paiement : regroupe
+Statistique "1" -- "0..*" Trajet : analyse
+Statistique "1" -- "0..*" Reservation : analyse
+
+@enduml
