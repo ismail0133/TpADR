@@ -1,0 +1,124 @@
+@startuml
+title ProxiVroum - Diagramme de composants du service central avec Clean Architecture
+
+skinparam componentStyle rectangle
+skinparam packageStyle rectangle
+skinparam shadowing false
+
+actor "Conducteur" as Conducteur
+actor "Passager" as Passager
+actor "Modérateur" as Moderateur
+actor "Service Comptabilité" as Comptabilite
+actor "Service de paiement externe" as PaiementExterne
+
+package "Service central ProxiVroum" {
+
+  package "Couche Présentation\nAPI REST / Controllers" {
+    component "TrajetController" as TrajetController
+    component "ReservationController" as ReservationController
+    component "PaiementController" as PaiementController
+    component "AvisController" as AvisController
+    component "LitigeController" as LitigeController
+    component "StatistiqueController" as StatistiqueController
+    component "ExportComptableController" as ExportController
+  }
+
+  package "Couche Application\nUse Cases" {
+    component "PublierTrajetUseCase" as PublierTrajet
+    component "RechercherTrajetUseCase" as RechercherTrajet
+    component "ReserverTrajetUseCase" as ReserverTrajet
+    component "EffectuerPaiementUseCase" as EffectuerPaiement
+    component "NoterApresTrajetUseCase" as NoterTrajet
+    component "SignalerLitigeUseCase" as SignalerLitige
+    component "TraiterLitigeUseCase" as TraiterLitige
+    component "ConsulterStatistiquesUseCase" as ConsulterStats
+    component "ExporterDonneesComptablesUseCase" as ExporterCompta
+  }
+
+  package "Couche Domaine\nEntités et règles métier" {
+    component "Utilisateur" as Utilisateur
+    component "Trajet" as Trajet
+    component "Reservation" as Reservation
+    component "Paiement" as Paiement
+    component "Avis" as Avis
+    component "Litige" as Litige
+    component "Statistique" as Statistique
+    component "ExportComptable" as ExportComptable
+  }
+
+  package "Couche Infrastructure\nPersistance et services externes" {
+    component "UtilisateurRepository" as UtilisateurRepo
+    component "TrajetRepository" as TrajetRepo
+    component "ReservationRepository" as ReservationRepo
+    component "PaiementRepository" as PaiementRepo
+    component "AvisRepository" as AvisRepo
+    component "LitigeRepository" as LitigeRepo
+    component "StatistiqueRepository" as StatRepo
+    component "ExportComptableRepository" as ExportRepo
+    component "PaiementGateway" as PaiementGateway
+    component "NotificationAdapter" as NotificationAdapter
+    database "Base de données\nProxiVroum" as DB
+  }
+}
+
+Conducteur --> TrajetController : publier trajet
+Conducteur --> AvisController : noter après trajet
+Conducteur --> LitigeController : signaler litige
+
+Passager --> ReservationController : rechercher / réserver
+Passager --> PaiementController : effectuer paiement
+Passager --> AvisController : noter après trajet
+Passager --> LitigeController : signaler litige
+
+Moderateur --> LitigeController : traiter litige
+Moderateur --> StatistiqueController : consulter statistiques
+
+Comptabilite --> ExportController : exporter données
+
+TrajetController --> PublierTrajet
+ReservationController --> RechercherTrajet
+ReservationController --> ReserverTrajet
+PaiementController --> EffectuerPaiement
+AvisController --> NoterTrajet
+LitigeController --> SignalerLitige
+LitigeController --> TraiterLitige
+StatistiqueController --> ConsulterStats
+ExportController --> ExporterCompta
+
+PublierTrajet --> Trajet
+RechercherTrajet --> Trajet
+ReserverTrajet --> Reservation
+ReserverTrajet --> Trajet
+EffectuerPaiement --> Paiement
+NoterTrajet --> Avis
+SignalerLitige --> Litige
+TraiterLitige --> Litige
+ConsulterStats --> Statistique
+ExporterCompta --> ExportComptable
+
+PublierTrajet --> TrajetRepo
+RechercherTrajet --> TrajetRepo
+ReserverTrajet --> ReservationRepo
+ReserverTrajet --> TrajetRepo
+EffectuerPaiement --> PaiementRepo
+EffectuerPaiement --> PaiementGateway
+NoterTrajet --> AvisRepo
+SignalerLitige --> LitigeRepo
+TraiterLitige --> LitigeRepo
+ConsulterStats --> StatRepo
+ExporterCompta --> ExportRepo
+
+UtilisateurRepo --> DB
+TrajetRepo --> DB
+ReservationRepo --> DB
+PaiementRepo --> DB
+AvisRepo --> DB
+LitigeRepo --> DB
+StatRepo --> DB
+ExportRepo --> DB
+
+PaiementGateway --> PaiementExterne : API paiement PCI-DSS
+NotificationAdapter --> Conducteur : notification
+NotificationAdapter --> Passager : notification
+
+@enduml
